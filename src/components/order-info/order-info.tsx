@@ -1,13 +1,14 @@
 import { TIngredient } from '@utils-types';
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector } from '../../services/store';
+import { getOrderByNumber } from '../../services/orderSlice';
+import { useDispatch, useSelector } from '../../services/store';
 import { OrderInfoUI } from '../ui/order-info';
 import { Preloader } from '../ui/preloader';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams<{ number: string }>();
-
+  const dispatch = useDispatch();
   const orderNumber = Number(number);
 
   const ingredients = useSelector((state) => state.ingredients.ingredients);
@@ -25,6 +26,12 @@ export const OrderInfo: FC = () => {
 
     return null;
   });
+
+  useEffect(() => {
+    if (!orderData) {
+      dispatch(getOrderByNumber(orderNumber));
+    }
+  }, [dispatch, orderData, orderNumber]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;

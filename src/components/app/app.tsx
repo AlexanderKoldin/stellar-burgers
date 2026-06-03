@@ -55,26 +55,12 @@ const App = () => {
       ) : (
         <>
           <Routes location={background || location}>
-            <Route
-              path='/'
-              element={
-                ingredients.length > 0 ? (
-                  <ConstructorPage />
-                ) : (
-                  <div
-                    className={`${styles.title} text text_type_main-medium pt-4`}
-                  >
-                    Нет ingredients
-                  </div>
-                )
-              }
-            />
+            <Route path='/' element={<ConstructorPage />} />
             <Route path='/feed' element={<Feed />} />
-
             <Route path='/feed/:number' element={<OrderInfo />} />
-
             <Route path='/ingredients/:id' element={<IngredientDetails />} />
 
+            {/* Использование твоего ProtectedRoute с Outlet */}
             <Route element={<ProtectedRoute onlyUnAuth />}>
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
@@ -112,9 +98,14 @@ const App = () => {
               <Route
                 path='/profile/orders/:number'
                 element={
-                  <Modal title='Информация о заказе' onClose={handleModalClose}>
-                    <OrderInfo />
-                  </Modal>
+                  <ProtectedRoute>
+                    <Modal
+                      title='Информация о заказе'
+                      onClose={handleModalClose}
+                    >
+                      <OrderInfo />
+                    </Modal>
+                  </ProtectedRoute>
                 }
               />
             </Routes>

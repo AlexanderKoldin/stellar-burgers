@@ -1,12 +1,17 @@
+import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from '../../services/store';
 import { Preloader } from '../ui';
 
 interface ProtectedRouteProps {
   onlyUnAuth?: boolean;
+  children?: React.ReactElement;
 }
 
-export const ProtectedRoute = ({ onlyUnAuth = false }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({
+  onlyUnAuth = false,
+  children
+}: ProtectedRouteProps) => {
   const location = useLocation();
 
   const isAuthChecked = useSelector((state) => state.user.isAuthChecked);
@@ -25,5 +30,5 @@ export const ProtectedRoute = ({ onlyUnAuth = false }: ProtectedRouteProps) => {
     return <Navigate to='/login' state={{ from: location }} replace />;
   }
 
-  return <Outlet />;
+  return children ? children : <Outlet />;
 };

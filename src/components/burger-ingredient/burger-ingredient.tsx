@@ -32,7 +32,7 @@ export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
     return (
       <BurgerIngredientUI
         ingredient={ingredient}
-        count={count}
+        count={count > 0 ? count : (null as unknown as number)}
         locationState={{ background: location }}
         handleAdd={handleAdd}
       />

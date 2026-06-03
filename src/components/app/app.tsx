@@ -15,6 +15,10 @@ import { useEffect } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import '../../index.css';
 import { fetchIngredients } from '../../services/ingredientsSlice';
+import {
+  selectIngredientsError,
+  selectIngredientsLoading
+} from '../../services/selectors';
 import { useDispatch, useSelector } from '../../services/store';
 import { checkUserAuth } from '../../services/userSlice';
 import { ProtectedRoute } from '../protected-route';
@@ -27,11 +31,8 @@ const App = () => {
 
   const background = location.state?.background;
 
-  const ingredients = useSelector((state) => state.ingredients.ingredients);
-  const isIngredientsLoading = useSelector(
-    (state) => state.ingredients.loading
-  );
-  const error = useSelector((state) => state.ingredients.error);
+  const isIngredientsLoading = useSelector(selectIngredientsLoading);
+  const error = useSelector(selectIngredientsError);
 
   useEffect(() => {
     dispatch(fetchIngredients());
@@ -50,7 +51,7 @@ const App = () => {
         <Preloader />
       ) : error ? (
         <div className={`${styles.error} text text_type_main-medium pt-4`}>
-          {error}
+          {String(error)}
         </div>
       ) : (
         <>
@@ -60,7 +61,6 @@ const App = () => {
             <Route path='/feed/:number' element={<OrderInfo />} />
             <Route path='/ingredients/:id' element={<IngredientDetails />} />
 
-            {/* Использование твоего ProtectedRoute с Outlet */}
             <Route element={<ProtectedRoute onlyUnAuth />}>
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />

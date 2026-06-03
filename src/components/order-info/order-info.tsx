@@ -2,6 +2,7 @@ import { TIngredient } from '@utils-types';
 import { FC, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { getOrderByNumber } from '../../services/orderSlice';
+import { selectIngredients, selectOrderById } from '../../services/selectors';
 import { useDispatch, useSelector } from '../../services/store';
 import { OrderInfoUI } from '../ui/order-info';
 import { Preloader } from '../ui/preloader';
@@ -11,21 +12,8 @@ export const OrderInfo: FC = () => {
   const dispatch = useDispatch();
   const orderNumber = Number(number);
 
-  const ingredients = useSelector((state) => state.ingredients.ingredients);
-
-  const orderData = useSelector((state) => {
-    let order = state.feeds.orders.find((item) => item.number === orderNumber);
-    if (order) return order;
-
-    order = state.feeds.userOrders.find((item) => item.number === orderNumber);
-    if (order) return order;
-
-    if (state.order.orderData?.number === orderNumber) {
-      return state.order.orderData;
-    }
-
-    return null;
-  });
+  const ingredients = useSelector(selectIngredients);
+  const orderData = useSelector(selectOrderById(orderNumber));
 
   useEffect(() => {
     if (!orderData) {
@@ -38,24 +26,16 @@ export const OrderInfo: FC = () => {
 
     const date = new Date(orderData.createdAt);
 
-    type TIngredientsWithCount = {
-      [key: string]: TIngredient & { count: number };
-    };
-
     const ingredientsInfo = orderData.ingredients.reduce(
-      (acc: TIngredientsWithCount, item) => {
+      (acc: Record<string, TIngredient & { count: number }>, item) => {
         if (!acc[item]) {
           const ingredient = ingredients.find((ing) => ing._id === item);
           if (ingredient) {
-            acc[item] = {
-              ...ingredient,
-              count: 1
-            };
+            acc[item] = { ...ingredient, count: 1 };
           }
         } else {
           acc[item].count++;
         }
-
         return acc;
       },
       {}
@@ -66,17 +46,10 @@ export const OrderInfo: FC = () => {
       0
     );
 
-    return {
-      ...orderData,
-      ingredientsInfo,
-      date,
-      total
-    };
+    return { ...orderData, ingredientsInfo, date, total };
   }, [orderData, ingredients]);
 
-  if (!orderInfo) {
-    return <Preloader />;
-  }
+  if (!orderInfo) return <Preloader />;
 
   return <OrderInfoUI orderInfo={orderInfo} />;
 };

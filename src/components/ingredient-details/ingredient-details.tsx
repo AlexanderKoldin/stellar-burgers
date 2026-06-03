@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { useParams } from 'react-router-dom';
+import { selectIngredientById } from '../../services/selectors';
 import { useSelector } from '../../services/store';
 import { IngredientDetailsUI } from '../ui/ingredient-details';
 import { Preloader } from '../ui/preloader';
@@ -7,9 +8,7 @@ import { Preloader } from '../ui/preloader';
 export const IngredientDetails: FC = () => {
   const { id } = useParams<{ id: string }>();
 
-  const ingredients = useSelector((state) => state.ingredients.ingredients);
-
-  const ingredientData = ingredients.find((item) => item._id === id);
+  const ingredientData = useSelector(selectIngredientById(id));
 
   if (!ingredientData) {
     return <Preloader />;

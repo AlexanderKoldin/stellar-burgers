@@ -1,6 +1,6 @@
 import { RegisterUI } from '@ui-pages';
 import { FC, SyntheticEvent, useState } from 'react';
-
+import { selectUserError } from '../../services/selectors';
 import { useDispatch, useSelector } from '../../services/store';
 import { registerUser } from '../../services/userSlice';
 
@@ -11,7 +11,7 @@ export const Register: FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const errorText = useSelector((state) => state.user.error) || '';
+  const errorText = useSelector(selectUserError) || '';
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();

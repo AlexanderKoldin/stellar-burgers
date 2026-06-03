@@ -31,7 +31,11 @@ export const Profile: FC = () => {
     e.preventDefault();
     if (!isFormChanged) return;
 
-    dispatch(updateUser(formValue))
+    const { password, ...dataToSend } = formValue;
+
+    const payload = password ? { ...dataToSend, password } : dataToSend;
+
+    dispatch(updateUser(payload))
       .unwrap()
       .then(() => {
         setFormValue((prevState) => ({ ...prevState, password: '' }));

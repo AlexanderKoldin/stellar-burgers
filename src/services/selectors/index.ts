@@ -24,6 +24,7 @@ export const selectFeedLoading = (state: RootState) => state.feeds.isLoading;
 export const selectFeedTotal = (state: RootState) => state.feeds.total;
 export const selectFeedTotalToday = (state: RootState) =>
   state.feeds.totalToday;
+
 export const selectOrderById = (number: number) => (state: RootState) =>
   state.feeds.orders.find((item) => item.number === number) ||
   state.feeds.userOrders.find((item) => item.number === number) ||
@@ -32,3 +33,7 @@ export const selectOrderById = (number: number) => (state: RootState) =>
 export const selectOrderData = (state: RootState) => state.order.orderData;
 export const selectOrderRequest = (state: RootState) =>
   state.order.orderRequest;
+
+export const selectOrderInfo = (state: RootState) => state.order.orderInfo;
+export const selectOrderInfoRequest = (state: RootState) =>
+  state.order.orderInfoRequest;

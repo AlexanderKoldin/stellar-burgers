@@ -1,8 +1,12 @@
 import { TIngredient } from '@utils-types';
 import { FC, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { getOrderByNumber } from '../../services/orderSlice';
-import { selectIngredients, selectOrderById } from '../../services/selectors';
+import { clearOrderInfo, getOrderByNumber } from '../../services/orderSlice';
+import {
+  selectIngredients,
+  selectOrderInfo,
+  selectOrderInfoRequest
+} from '../../services/selectors';
 import { useDispatch, useSelector } from '../../services/store';
 import { OrderInfoUI } from '../ui/order-info';
 import { Preloader } from '../ui/preloader';
@@ -13,13 +17,24 @@ export const OrderInfo: FC = () => {
   const orderNumber = Number(number);
 
   const ingredients = useSelector(selectIngredients);
-  const orderData = useSelector(selectOrderById(orderNumber));
+  const orderData = useSelector(selectOrderInfo);
+  const isRequest = useSelector(selectOrderInfoRequest);
 
   useEffect(() => {
-    if (!orderData) {
-      dispatch(getOrderByNumber(orderNumber));
+    if (orderData?.number === orderNumber) {
+      return;
     }
-  }, [dispatch, orderData, orderNumber]);
+
+    if (isRequest) {
+      return;
+    }
+
+    dispatch(getOrderByNumber(orderNumber));
+
+    return () => {
+      dispatch(clearOrderInfo());
+    };
+  }, [dispatch, orderNumber, orderData?.number, isRequest]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;

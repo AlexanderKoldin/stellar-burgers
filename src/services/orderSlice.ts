@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
-
 import { getOrderByNumberApi, orderBurgerApi } from '../utils/burger-api';
 
 export const createOrder = createAsyncThunk(
@@ -22,12 +21,16 @@ export const getOrderByNumber = createAsyncThunk(
 interface OrderState {
   orderData: TOrder | null;
   orderRequest: boolean;
+  orderInfo: TOrder | null;
+  orderInfoRequest: boolean;
   error: string | null;
 }
 
 const initialState: OrderState = {
   orderData: null,
   orderRequest: false,
+  orderInfo: null,
+  orderInfoRequest: false,
   error: null
 };
 
@@ -37,11 +40,13 @@ const orderSlice = createSlice({
   reducers: {
     clearOrderData: (state) => {
       state.orderData = null;
+    },
+    clearOrderInfo: (state) => {
+      state.orderInfo = null;
     }
   },
   extraReducers: (builder) => {
     builder
-
       .addCase(createOrder.pending, (state) => {
         state.orderRequest = true;
         state.error = null;
@@ -54,21 +59,20 @@ const orderSlice = createSlice({
         state.orderRequest = false;
         state.error = action.error.message || 'Не удалось оформить заказ';
       })
-
       .addCase(getOrderByNumber.pending, (state) => {
-        state.orderRequest = true;
+        state.orderInfoRequest = true;
         state.error = null;
       })
       .addCase(getOrderByNumber.fulfilled, (state, action) => {
-        state.orderRequest = false;
-        state.orderData = action.payload;
+        state.orderInfoRequest = false;
+        state.orderInfo = action.payload;
       })
       .addCase(getOrderByNumber.rejected, (state, action) => {
-        state.orderRequest = false;
+        state.orderInfoRequest = false;
         state.error = action.error.message || 'Не удалось загрузить заказ';
       });
   }
 });
 
-export const { clearOrderData } = orderSlice.actions;
+export const { clearOrderData, clearOrderInfo } = orderSlice.actions;
 export default orderSlice.reducer;

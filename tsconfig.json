@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2015",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -28,5 +28,5 @@
       "@selectors": ["src/services/selectors"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "tests/order.spec.ts", "tests/modal.spec.ts"]
 }

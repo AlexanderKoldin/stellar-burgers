@@ -10,7 +10,8 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:4000',
-    trace: 'on-first-retry'
+    trace: 'on-first-retry',
+    actionTimeout: 15000
   },
   projects: [
     {

@@ -2,40 +2,40 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Конструктор бургеров', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/ingredients', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          data: [
-            {
-              _id: '60666c42cc7b9100273a666b',
-              name: 'Флюоресцентная булка',
-              type: 'bun',
-              image: 'test.png',
-              price: 988
-            },
-            {
-              _id: '60666c42cc7b9100273a666d',
-              name: 'Биокотлета из марсианской Магнолии',
-              type: 'main',
-              image: 'test.png',
-              price: 424
-            }
-          ]
-        })
-      });
+    await page.routeFromHAR('./tests/hars/app.har', {
+      url: '**/api/ingredients',
+      notFound: 'fallback'
     });
 
     await page.goto('/');
   });
 
-  test('Добавление булки в конструктор', async ({ page }) => {
+  test('добавление булки в конструктор', async ({ page }) => {
+    const firstIngredient = page.locator('li').first();
+    const ingredientName = await firstIngredient
+      .locator('p')
+      .last()
+      .textContent();
+
     await page.getByRole('button', { name: 'Добавить' }).first().click();
 
-    await expect(page.getByText('Флюоресцентная булка (верх)')).toBeVisible();
+    await expect(page.getByText(`${ingredientName} (верх)`)).toBeVisible();
+    await expect(page.getByText(`${ingredientName} (низ)`)).toBeVisible();
+  });
 
-    await expect(page.getByText('Флюоресцентная булка (низ)')).toBeVisible();
+  test('добавление начинки в конструктор', async ({ page }) => {
+    const mainIngredient = page.locator('li').nth(1);
+    const ingredientName = await mainIngredient
+      .locator('p')
+      .last()
+      .textContent();
+
+    await page.getByRole('button', { name: 'Добавить' }).nth(1).click();
+
+    await expect(
+      page
+        .locator('.constructor-element__text', { hasText: ingredientName! })
+        .first()
+    ).toBeVisible();
   });
 });

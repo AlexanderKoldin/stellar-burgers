@@ -92,7 +92,8 @@
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier ./src --write",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "test:e2e": "playwright test"
   },
   "eslintConfig": {
     "extends": [
@@ -103,6 +104,12 @@
     "testPathIgnorePatterns": [
       "<rootDir>/tests/"
     ],
-    "testEnvironment": "jsdom"
+    "testEnvironment": "jsdom",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(css|less|scss)$": "jest-css-modules-transform"
+    }
   }
 }

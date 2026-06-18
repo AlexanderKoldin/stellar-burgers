@@ -46,4 +46,15 @@ describe('ingredientsSlice', () => {
     expect(state.ingredients).toEqual(mockIngredients);
     expect(state.loading).toBe(false);
   });
+
+  test('должен установить ошибку при fetchIngredients.rejected', () => {
+    const action = {
+      type: fetchIngredients.rejected.type,
+      error: { message: 'Ошибка загрузки' }
+    };
+
+    const state = ingredientsReducer(initialState, action);
+    expect(state.loading).toBe(false);
+    expect(state.error).toBe('Ошибка загрузки');
+  });
 });

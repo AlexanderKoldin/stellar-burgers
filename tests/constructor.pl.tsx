@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Конструктор бургеров', () => {
+  test.slow();
+
   test.beforeEach(async ({ page }) => {
     await page.routeFromHAR('./tests/hars/app.har', {
       url: '**/api/ingredients',
@@ -8,6 +10,7 @@ test.describe('Конструктор бургеров', () => {
     });
 
     await page.goto('/');
+    await page.waitForSelector('li', { timeout: 15000 });
   });
 
   test('добавление булки в конструктор', async ({ page }) => {

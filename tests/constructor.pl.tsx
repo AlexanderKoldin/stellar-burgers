@@ -20,10 +20,20 @@ test.describe('Конструктор бургеров', () => {
       .last()
       .textContent();
 
+    const constructor = page.locator('section').filter({
+      has: page.getByRole('button', { name: 'Оформить заказ' })
+    });
+
+    await expect(constructor.getByText('Выберите булки').first()).toBeVisible();
+
     await page.getByRole('button', { name: 'Добавить' }).first().click();
 
-    await expect(page.getByText(`${ingredientName} (верх)`)).toBeVisible();
-    await expect(page.getByText(`${ingredientName} (низ)`)).toBeVisible();
+    await expect(
+      constructor.getByText(`${ingredientName} (верх)`)
+    ).toBeVisible();
+    await expect(
+      constructor.getByText(`${ingredientName} (низ)`)
+    ).toBeVisible();
   });
 
   test('добавление начинки в конструктор', async ({ page }) => {
@@ -33,10 +43,16 @@ test.describe('Конструктор бургеров', () => {
       .last()
       .textContent();
 
+    const constructor = page.locator('section').filter({
+      has: page.getByRole('button', { name: 'Оформить заказ' })
+    });
+
+    await expect(constructor.getByText('Выберите начинку')).toBeVisible();
+
     await page.getByRole('button', { name: 'Добавить' }).nth(1).click();
 
     await expect(
-      page
+      constructor
         .locator('.constructor-element__text', { hasText: ingredientName! })
         .first()
     ).toBeVisible();

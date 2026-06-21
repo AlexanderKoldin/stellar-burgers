@@ -21,9 +21,13 @@ test.describe('Модальное окно ингредиента', () => {
       .last()
       .textContent();
 
-    await firstIngredient.click();
-
     const modal = page.locator('#modals');
+
+    await expect(
+      modal.getByRole('heading', { name: /детали ингредиента/i })
+    ).not.toBeVisible();
+
+    await firstIngredient.click();
 
     await expect(
       modal.getByRole('heading', { name: /детали ингредиента/i })
@@ -33,9 +37,13 @@ test.describe('Модальное окно ингредиента', () => {
   });
 
   test('закрытие модального окна', async ({ page }) => {
-    await page.locator('li').first().click();
-
     const modal = page.locator('#modals');
+
+    await expect(
+      modal.getByRole('heading', { name: /детали ингредиента/i })
+    ).not.toBeVisible();
+
+    await page.locator('li').first().click();
 
     await expect(
       modal.getByRole('heading', { name: /детали ингредиента/i })
@@ -45,6 +53,6 @@ test.describe('Модальное окно ингредиента', () => {
 
     await expect(
       modal.getByRole('heading', { name: /детали ингредиента/i })
-    ).toBeHidden();
+    ).not.toBeVisible();
   });
 });

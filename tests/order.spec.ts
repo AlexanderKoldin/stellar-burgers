@@ -1,51 +1,43 @@
 import { expect, test } from '@playwright/test';
 
+const ORDER_NUMBER = '106820';
+
 test.describe('Создание заказа в конструкторе бургера', () => {
   test.slow();
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
+    const loginResponse = await request.post(
+      'https://norma.education-services.ru/api/auth/login',
+      {
+        data: {
+          email: 'me@mail.com',
+          password: '123'
+        }
+      }
+    );
+
+    const { accessToken, refreshToken } = await loginResponse.json();
+
     await page.routeFromHAR('./tests/hars/app.har', {
-      url: '**/api/ingredients',
+      url: '**/api/**',
       notFound: 'fallback'
-    });
-
-    await page.route('**/api/auth/user', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          user: { email: 'test@test.ru', name: 'Test User' }
-        })
-      });
-    });
-
-    await page.route('**/api/orders', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          order: { number: 77777 }
-        })
-      });
-    });
-
-    await page.goto('/', { waitUntil: 'networkidle' });
-    await page.waitForSelector('li', { timeout: 15000 });
-
-    await page.evaluate(() => {
-      localStorage.setItem('refreshToken', 'test_refresh_token');
     });
 
     await page.context().addCookies([
       {
         name: 'accessToken',
-        value: 'Bearer test_token',
+        value: accessToken,
         domain: 'localhost',
         path: '/'
       }
     ]);
+
+    await page.addInitScript((token) => {
+      localStorage.setItem('refreshToken', token);
+    }, refreshToken);
+
+    await page.goto('/');
+    await page.waitForSelector('li', { timeout: 15000 });
   });
 
   test.afterEach(async ({ page, context }) => {
@@ -57,6 +49,7 @@ test.describe('Создание заказа в конструкторе бур�
     await expect(page.getByText('Соберите бургер')).toBeVisible();
 
     await page.getByRole('button', { name: 'Добавить' }).first().click();
+    await page.getByRole('button', { name: 'Добавить' }).nth(1).click();
 
     const orderButton = page.getByRole('button', { name: 'Оформить заказ' });
 
@@ -66,12 +59,12 @@ test.describe('Создание заказа в конструкторе бур�
 
     const modal = page.locator('#modals');
 
-    await expect(modal.getByText('77777')).toBeVisible({ timeout: 10000 });
+    await expect(modal.getByText(ORDER_NUMBER)).toBeVisible({ timeout: 10000 });
     await expect(modal.getByText(/идентификатор заказа/i)).toBeVisible();
 
     await page.keyboard.press('Escape');
 
-    await expect(modal.getByText('77777')).toBeHidden();
+    await expect(modal.getByText(ORDER_NUMBER)).toBeHidden();
 
     await expect(page.getByText('Выберите булки').first()).toBeVisible();
     await expect(page.getByText('Выберите начинку').first()).toBeVisible();
